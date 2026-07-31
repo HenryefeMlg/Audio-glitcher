@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Ses Glitch Simülatörü (400MB Hatası)</title>
+    <style>
+        body {
+            background-color: #0a0a0c;
+            color: #00ff66;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            border: 2px solid #00ff66;
+            padding: 40px;
+            background: rgba(0, 255, 102, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+            border-radius: 8px;
+            max-width: 500px;
+        }
+        h1 { font-size: 24px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+        p { color: #888; font-size: 14px; line-height: 1.6; }
+        .status { margin: 20px 0; font-weight: bold; color: #ff3333; animation: blink 1s infinite; }
+        button {
+            background-color: #00ff66;
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+        }
+        button:hover {
+            background-color: #000;
+            color: #00ff66;
+            border: 1px solid #00ff66;
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.8);
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ERROR: BUFFER OVERFLOW</h1>
+    <p>Roblox sunucu dönüştürme hatası simüle ediliyor. 2 saniyelik zaman dilimine sıkışmış 400 MB'lık ham dijital verinin sese dönüşmüş hali.</p>
+    <div class="status">DURUM: DOSYA BOZULDU (400 MB)</div>
+    <!-- Ses şiddeti yüksek olabileceğinden hoparlör sesini biraz kısmanız önerilir -->
+    <button onclick="bozukSesiOynat()">Cıvıltıyı Başlat</button>
+</div>
+
+<script>
+let audioCtx = null;
+
+function bozukSesiOynat() {
+    // Tarayıcı güvenlik engellerini aşmak için her tıklamada AudioContext kontrol edilir
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    const duration = 2.0; // 2 saniyelik tam süre
+    const sampleRate = audioCtx.sampleRate;
+    const totalSamples = sampleRate * duration;
+    
+    // Boş ses kanalı oluşturulur
+    const buffer = audioCtx.createBuffer(1, totalSamples, sampleRate);
+    const channelData = buffer.getChannelData(0);
+
+    // Roblox'un veriyi saniyede milyonlarca kez yanlış okuyup cıvıldatmasını sağlayan matematiksel döngü
+    for (let i = 0; i < totalSamples; i++) {
+        // Zaman ilerledikçe katlanarak artan çılgın bir frekans (Chirp efekti)
+        let t = i / sampleRate;
+        
+        // Üstel olarak hızlanan ana frekans dalgası
+        let frequencyExponent = Math.sin(t * 15) * 2000 + (t * 8000);
+        let primaryWave = Math.sin(2 * Math.PI * frequencyExponent * t);
+        
+        // Dijital bozulma (Glitch) ve sertlik katmak için beyaz gürültü ile harmanlama
+        let noise = Math.random() - 0.5;
+        
+        // Roblox'un 400 MB'lık ham sıfır-bir verisini (Raw PCM) taklit eden kare dalga kırpması (Bitcrush)
+        let rawSignal = (primaryWave * 0.7) + (noise * 0.3);
+        channelData[i] = rawSignal > 0 ? 0.4 : -0.4; // Sesi aşırı dijitalleştiren sert kırpma
+    }
+
+    // Oluşturulan sentezlenmiş sesi hoparlöre bağlama
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    
+    // Aşırı yüksek sesten kulaklarınızı korumak için ses seviyesi sınırlandırıcı (Gain)
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); // Güvenli ses seviyesi ayarı
+    
+    source.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    // Sesi başlat
+    source.start();
+}
+</script>
+
+</body>
+</html>
